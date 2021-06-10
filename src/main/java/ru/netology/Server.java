@@ -1,24 +1,43 @@
 package ru.netology;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    final static int port = 8080;
+    final static int port = 8181;
+
+
 
     public static void main(String[] args) {
 
         try (ServerSocket serverSocket = new ServerSocket(port);
              Socket clientSocket = serverSocket.accept();
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+             InputStream from = clientSocket.getInputStream();
+             OutputStream to = clientSocket.getOutputStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(from));
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(to))) {
+          while (true) {
+              writer.write("Write your name..." + "\n");
+              writer.flush();
+              String name = reader.readLine();
+              writer.write("  Are you child? (yes/no)" + "\n");
+              writer.flush();
 
-            final String name = in.readLine();
-            System.out.printf("Hi %s, your port is %d%n", name, clientSocket.getPort());
+
+              String answer = reader.readLine();
+
+              if (answer.equals("yes")) {
+                  writer.write("Welcome to the kids area," + name + " Let's play!" + "\n" );
+              } else {
+                  writer.write("Welcome to the adult zone, " + name + " Have a good rest, or a good working day!" + "\n");
+                  break;
+              }
+              writer.flush();
+
+
+          }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
